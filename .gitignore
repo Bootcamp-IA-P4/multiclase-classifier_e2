@@ -137,7 +137,8 @@ env.bak/
 venv.bak/
 *.csv
 .DS_Store
-
+data/
+.vscode/
 
 # Spyder project settings
 .spyderproject
