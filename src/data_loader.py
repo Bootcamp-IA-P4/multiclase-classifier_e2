@@ -1,52 +1,32 @@
 # src/data_loader.py
+
 import pandas as pd
-import joblib
 import os
-import pyarrow.parquet as pq
+import pyarrow.parquet as pq # Importar pyarrow para verificar la validez del archivo Parquet
 
 def is_valid_parquet(filepath):
+    """
+    Verifica si un archivo Parquet existe y es válido (no vacío ni corrupto).
+    """
     if not os.path.exists(filepath):
         return False
-    if os.path.getsize(filepath) == 0:
+    if os.path.getsize(filepath) == 0:  # Archivo vacío
         return False
     try:
+        # Intenta leer los metadatos sin cargar todo el contenido
         pq.read_metadata(filepath)
         return True
     except Exception as e:
+        print(f"Advertencia: Archivo Parquet corrupto o inválido en {filepath}: {e}")
         return False
 
-def load_processed_data(data_dir='../data/processed_data'):
-    X_train_scaled_path = os.path.join(data_dir, 'X_train_scaled.parquet')
-    X_test_scaled_path = os.path.join(data_dir, 'X_test_scaled.parquet')
-    y_train_path = os.path.join(data_dir, 'y_train.parquet')
-    y_test_path = os.path.join(data_dir, 'y_test.parquet')
-    scaler_path = os.path.join(data_dir, 'scaler.joblib')
-
-    if not (is_valid_parquet(X_train_scaled_path) and
-            is_valid_parquet(X_test_scaled_path) and
-            is_valid_parquet(y_train_path) and
-            is_valid_parquet(y_test_path) and
-            os.path.exists(scaler_path)):
-        raise FileNotFoundError("Algunos archivos de datos preprocesados o el escalador no existen o están corruptos.")
-
-    X_train_scaled = pd.read_parquet(X_train_scaled_path)
-    X_test_scaled = pd.read_parquet(X_test_scaled_path)
-    y_train = pd.read_parquet(y_train_path).squeeze()
-    y_test = pd.read_parquet(y_test_path).squeeze()
-    scaler = joblib.load(scaler_path)
-
-    # Cargar los datasets SMOTE y RUS preexistentes si existen
-    X_train_smote_prev, y_train_smote_prev = None, None
-    smote_paths = (os.path.join(data_dir, 'X_train_smote.parquet'), os.path.join(data_dir, 'y_train_smote.parquet'))
-    if is_valid_parquet(smote_paths[0]) and is_valid_parquet(smote_paths[1]):
-        X_train_smote_prev = pd.read_parquet(smote_paths[0])
-        y_train_smote_prev = pd.read_parquet(smote_paths[1]).squeeze()
-
-    X_train_rus_prev, y_train_rus_prev = None, None
-    rus_paths = (os.path.join(data_dir, 'X_train_rus.parquet'), os.path.join(data_dir, 'y_train_rus.parquet'))
-    if is_valid_parquet(rus_paths[0]) and is_valid_parquet(rus_paths[1]):
-        X_train_rus_prev = pd.read_parquet(rus_paths[0])
-        y_train_rus_prev = pd.read_parquet(rus_paths[1]).squeeze()
-
-    print("Datos preprocesados cargados exitosamente.")
-    return X_train_scaled, X_test_scaled, y_train, y_test, scaler, X_train_smote_prev, y_train_smote_prev, X_train_rus_prev, y_train_rus_prev
+def load_raw_data(raw_data_path='../data/diabetes_012_health_indicators.csv'):
+    """
+    Carga el DataFrame original desde un archivo CSV.
+    """
+    if not os.path.exists(raw_data_path):
+        raise FileNotFoundError(f"El archivo de datos brutos no se encuentra en: {raw_data_path}")
+    print(f"Cargando datos brutos desde: {raw_data_path}")
+    df = pd.read_csv(raw_data_path)
+    print("Datos brutos cargados exitosamente.")
+    return df

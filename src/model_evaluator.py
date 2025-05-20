@@ -1,9 +1,15 @@
+# src/model_utilities.py
+
 import joblib
 import os
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import confusion_matrix
 
-def save_model_and_report(model, model_name, set_name, best_params, best_score, tuning_time, report, cm, models_dir, reports_dir):
+def save_model_and_report(model, model_name, set_name, best_params, best_score, tuning_time, report, cm, models_dir, reports_dir, show_plot=False):
     """
     Guarda el modelo optimizado y genera un informe de rendimiento en formato Markdown.
+    También puede mostrar la matriz de confusión.
 
     Args:
         model: El modelo de sklearn entrenado y optimizado.
@@ -16,7 +22,12 @@ def save_model_and_report(model, model_name, set_name, best_params, best_score, 
         cm (ndarray): La matriz de confusión.
         models_dir (str): Directorio donde guardar el modelo.
         reports_dir (str): Directorio donde guardar el informe.
+        show_plot (bool): Si es True, muestra la matriz de confusión como un plot.
     """
+    # Asegurar que los directorios existan
+    os.makedirs(models_dir, exist_ok=True)
+    os.makedirs(reports_dir, exist_ok=True)
+
     # Guardar el modelo
     optimized_model_filename = os.path.join(models_dir, f"{model_name.replace(' ', '_')}_{set_name.replace(' ', '_')}_tuned.joblib")
     joblib.dump(model, optimized_model_filename)
@@ -35,6 +46,16 @@ def save_model_and_report(model, model_name, set_name, best_params, best_score, 
         f.write("```\n\n")
         f.write("## Confusion Matrix on Test Set\n")
         f.write("```\n")
-        f.write(str(cm))
+        f.write(str(cm)) # Convertir la matriz de confusión a string para escribirla
         f.write("\n```\n")
     print(f"Informe guardado: {report_filename}")
+
+    if show_plot:
+        plt.figure(figsize=(8, 6))
+        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
+                    xticklabels=['No Diabetes', 'Prediabetes', 'Diabetes'],
+                    yticklabels=['No Diabetes', 'Prediabetes', 'Diabetes'])
+        plt.title(f'Matriz de Confusión - {model_name} (Optimizado con {set_name})')
+        plt.xlabel('Predicción')
+        plt.ylabel('Real')
+        plt.show()

@@ -175,3 +175,6 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# This is a common file format used for saving and loading machine learning models.
+**/*.joblib
