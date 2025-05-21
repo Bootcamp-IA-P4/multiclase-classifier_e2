@@ -12,23 +12,7 @@ import pyarrow.parquet as pq
 
 # Importar la función auxiliar del data_loader para la validación de parquet
 from .data_loader import is_valid_parquet
-
-# src/data_preprocessor.py (Actualizado)
-
-import pandas as pd
-import os
-import pyarrow.parquet as pq
-from collections import Counter
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from imblearn.over_sampling import SMOTE
-from imblearn.under_sampling import RandomUnderSampler
-
-
-# Importar la función auxiliar del data_loader para la validación de parquet
-# Asumiendo que is_valid_parquet está en data_loader.py
-from .data_loader import is_valid_parquet
-
+from .resamplers import apply_hybrid_resampling # Importar la función de remuestreo híbrido
 
 def remove_duplicates_and_save(df, data_dir='../data/processed_data', target_column='Diabetes_012'):
     """
@@ -72,10 +56,6 @@ def remove_duplicates_and_save(df, data_dir='../data/processed_data', target_col
         print(f"Tamaño del DataFrame después de eliminar duplicados: {len(df_unique)}")
 
         # Visualización de la distribución de la variable objetivo
-        # NOTA: La visualización se deja en la función para mostrar la lógica completa,
-        # pero para cuadernos interactivos, a veces es preferible que la visualización
-        # se haga en el propio cuaderno después de obtener el df_unique.
-        # Aquí la incluyo para que la salida sea igual a tu snippet original.
         import matplotlib.pyplot as plt
         import seaborn as sns
         plt.figure(figsize=(8, 6))
@@ -94,13 +74,10 @@ def remove_duplicates_and_save(df, data_dir='../data/processed_data', target_col
 
     return df_unique
 
-# Mantén el resto de las funciones en data_preprocessor.py como estaban
-# (preprocess_and_resample_data y check_and_load_processed_data)
-# ...
 
 def preprocess_and_resample_data(df_unique, data_dir='../data/processed_data', random_state=42):
     """
-    Realiza el preprocesamiento de datos (división, escalado) y aplica técnicas de remuestreo (SMOTE, RUS).
+    Realiza el preprocesamiento de datos (división, escalado) y aplica técnicas de remuestreo (SMOTE, RUS, SMOTE-ENN, SMOTE-Tomek).
     Guarda los datasets resultantes y el escalador.
 
     Args:
@@ -110,7 +87,8 @@ def preprocess_and_resample_data(df_unique, data_dir='../data/processed_data', r
 
     Returns:
         tuple: Contiene X_train_scaled, X_test_scaled, y_train, y_test, scaler,
-               X_train_smote, y_train_smote, X_train_rus, y_train_rus.
+               X_train_smote, y_train_smote, X_train_rus, y_train_rus,
+               X_train_smoteenn, y_train_smoteenn, X_train_smotetomek, y_train_smotetomek.
     """
     print("Datos preprocesados no encontrados o incompletos/corruptos. Realizando preprocesamiento desde el inicio...")
 
@@ -128,6 +106,10 @@ def preprocess_and_resample_data(df_unique, data_dir='../data/processed_data', r
     y_train_smote_path = os.path.join(data_dir, 'y_train_smote.parquet')
     X_train_rus_path = os.path.join(data_dir, 'X_train_rus.parquet')
     y_train_rus_path = os.path.join(data_dir, 'y_train_rus.parquet')
+    X_train_smoteenn_path = os.path.join(data_dir, 'X_train_smoteenn.parquet') # Nuevo
+    y_train_smoteenn_path = os.path.join(data_dir, 'y_train_smoteenn.parquet') # Nuevo
+    X_train_smotetomek_path = os.path.join(data_dir, 'X_train_smotetomek.parquet') # Nuevo
+    y_train_smotetomek_path = os.path.join(data_dir, 'y_train_smotetomek.parquet') # Nuevo
     scaler_path = os.path.join(data_dir, 'scaler.joblib')
 
     # Separar la variable objetivo (y) de las características (X)
@@ -173,6 +155,12 @@ def preprocess_and_resample_data(df_unique, data_dir='../data/processed_data', r
     X_train_rus = pd.DataFrame(X_train_rus_array, columns=numerical_cols)
     y_train_rus = pd.Series(y_train_rus_array, name='Diabetes_012')
 
+    # --- Aplicar técnicas de remuestreo híbridas ---
+    # Se aplican aquí para que puedan ser guardadas y cargadas posteriormente
+    X_train_smoteenn, y_train_smoteenn = apply_hybrid_resampling(X_train_scaled, y_train, method='smoteenn', random_state=random_state)
+    X_train_smotetomek, y_train_smotetomek = apply_hybrid_resampling(X_train_scaled, y_train, method='smotetomek', random_state=random_state)
+
+
     # --- Guardar los datos procesados y el escalador ---
     print("\nGuardando datos preprocesados y escalador...")
     X_train_scaled.to_parquet(X_train_scaled_path, index=True)
@@ -183,10 +171,17 @@ def preprocess_and_resample_data(df_unique, data_dir='../data/processed_data', r
     y_train_smote.to_frame(name='Diabetes_012').to_parquet(y_train_smote_path, index=True)
     X_train_rus.to_parquet(X_train_rus_path, index=True)
     y_train_rus.to_frame(name='Diabetes_012').to_parquet(y_train_rus_path, index=True)
+    X_train_smoteenn.to_parquet(X_train_smoteenn_path, index=True) # Guardar
+    y_train_smoteenn.to_frame(name='Diabetes_012').to_parquet(y_train_smoteenn_path, index=True) # Guardar
+    X_train_smotetomek.to_parquet(X_train_smotetomek_path, index=True) # Guardar
+    y_train_smotetomek.to_frame(name='Diabetes_012').to_parquet(y_train_smotetomek_path, index=True) # Guardar
     joblib.dump(scaler, scaler_path)
     print("Datos y escalador guardados exitosamente para futuras sesiones.")
 
-    return X_train_scaled, X_test_scaled, y_train, y_test, scaler, X_train_smote, y_train_smote, X_train_rus, y_train_rus
+    return X_train_scaled, X_test_scaled, y_train, y_test, scaler, \
+           X_train_smote, y_train_smote, X_train_rus, y_train_rus, \
+           X_train_smoteenn, y_train_smoteenn, X_train_smotetomek, y_train_smotetomek
+
 
 def check_and_load_processed_data(data_dir='../data/processed_data'):
     """
@@ -208,6 +203,10 @@ def check_and_load_processed_data(data_dir='../data/processed_data'):
     y_train_smote_path = os.path.join(data_dir, 'y_train_smote.parquet')
     X_train_rus_path = os.path.join(data_dir, 'X_train_rus.parquet')
     y_train_rus_path = os.path.join(data_dir, 'y_train_rus.parquet')
+    X_train_smoteenn_path = os.path.join(data_dir, 'X_train_smoteenn.parquet') # Nuevo
+    y_train_smoteenn_path = os.path.join(data_dir, 'y_train_smoteenn.parquet') # Nuevo
+    X_train_smotetomek_path = os.path.join(data_dir, 'X_train_smotetomek.parquet') # Nuevo
+    y_train_smotetomek_path = os.path.join(data_dir, 'y_train_smotetomek.parquet') # Nuevo
     scaler_path = os.path.join(data_dir, 'scaler.joblib')
 
     all_files_exist_and_valid = (
@@ -219,6 +218,10 @@ def check_and_load_processed_data(data_dir='../data/processed_data'):
         is_valid_parquet(y_train_smote_path) and
         is_valid_parquet(X_train_rus_path) and
         is_valid_parquet(y_train_rus_path) and
+        is_valid_parquet(X_train_smoteenn_path) and # Nuevo
+        is_valid_parquet(y_train_smoteenn_path) and # Nuevo
+        is_valid_parquet(X_train_smotetomek_path) and # Nuevo
+        is_valid_parquet(y_train_smotetomek_path) and # Nuevo
         os.path.exists(scaler_path)
     )
 
@@ -233,10 +236,15 @@ def check_and_load_processed_data(data_dir='../data/processed_data'):
             y_train_smote = pd.read_parquet(y_train_smote_path).squeeze()
             X_train_rus = pd.read_parquet(X_train_rus_path)
             y_train_rus = pd.read_parquet(y_train_rus_path).squeeze()
+            X_train_smoteenn = pd.read_parquet(X_train_smoteenn_path) # Cargar
+            y_train_smoteenn = pd.read_parquet(y_train_smoteenn_path).squeeze() # Cargar
+            X_train_smotetomek = pd.read_parquet(X_train_smotetomek_path) # Cargar
+            y_train_smotetomek = pd.read_parquet(y_train_smotetomek_path).squeeze() # Cargar
             scaler = joblib.load(scaler_path)
             print("Datos cargados exitosamente.")
             return True, (X_train_scaled, X_test_scaled, y_train, y_test, scaler,
-                          X_train_smote, y_train_smote, X_train_rus, y_train_rus)
+                          X_train_smote, y_train_smote, X_train_rus, y_train_rus,
+                          X_train_smoteenn, y_train_smoteenn, X_train_smotetomek, y_train_smotetomek)
         except Exception as e:
             print(f"Error al cargar datos. Se recomienda reprocesar: {e}")
             return False, None
