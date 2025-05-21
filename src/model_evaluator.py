@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
 
-def save_model_and_report(model, model_name, set_name, best_params, best_score, tuning_time, report, cm, models_dir, reports_dir, show_plot=False):
+def save_model_and_report(model, model_name, set_name, best_params, best_score, tuning_time, report, cm, models_dir, reports_dir, show_plot=False, train_score=None):
     """
     Guarda el modelo optimizado y genera un informe de rendimiento en formato Markdown.
     También puede mostrar la matriz de confusión.
@@ -23,6 +23,7 @@ def save_model_and_report(model, model_name, set_name, best_params, best_score, 
         models_dir (str): Directorio donde guardar el modelo.
         reports_dir (str): Directorio donde guardar el informe.
         show_plot (bool): Si es True, muestra la matriz de confusión como un plot.
+        train_score (float, optional): El score del modelo en el conjunto de entrenamiento. Usado para detectar overfitting.
     """
     # Asegurar que los directorios existan
     os.makedirs(models_dir, exist_ok=True)
@@ -38,7 +39,17 @@ def save_model_and_report(model, model_name, set_name, best_params, best_score, 
     with open(report_filename, 'w') as f:
         f.write(f"# Performance Report for {model_name} (Tuned with {set_name})\n\n")
         f.write(f"**Best Parameters (CV):**\n```json\n{best_params}\n```\n\n")
-        f.write(f"**Best CV Score:** {best_score:.4f}\n\n") # Generalizamos el nombre del score
+        f.write(f"**Best CV Score (Validation - Precision Prediabetes):** {best_score:.4f}\n\n") # Cambiado para claridad
+        
+        if train_score is not None:
+            f.write(f"**Train Score (Precision Prediabetes):** {train_score:.4f}\n\n") # Añadido el score de entrenamiento
+            
+            # Calcular y explicar el overfitting
+            overfitting_diff = train_score - best_score
+            f.write(f"## Overfitting Analysis\n\n")
+            f.write(f"The difference between the Train Score ({train_score:.4f}) and the Best CV Score (Validation) ({best_score:.4f}) is: **{overfitting_diff:.4f}**.\n\n")
+            f.write("A large positive difference indicates potential overfitting, meaning the model performs much better on the training data than on unseen validation data. A value closer to 0 suggests a better balance between bias and variance.\n\n")
+            
         f.write(f"**Tuning Time:** {tuning_time:.2f} seconds\n\n")
         f.write("## Classification Report on Test Set\n")
         f.write("```\n")
