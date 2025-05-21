@@ -139,6 +139,7 @@ venv.bak/
 .DS_Store
 data/
 .vscode/
+models/*.pkl
 
 # Spyder project settings
 .spyderproject
