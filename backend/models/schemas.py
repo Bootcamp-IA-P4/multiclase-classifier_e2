@@ -1,9 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import Optional
 
-
 class HealthForm(BaseModel):
-    #user_id: str
     age: int
     sex: int
     bmi: float
@@ -25,15 +23,11 @@ class HealthForm(BaseModel):
     chol_check: bool
     stroke: bool
     heart_disease_or_attack: bool
-    
-
 
 class DiabetesPrediction(BaseModel):
-    patient_data_id: str  # UUID 
-    predicted_diabetes: int = Field(..., ge=0, le=2)  # 0, 1 or 2
+    patient_data_id: str  # UUID o similar
+    predicted_diabetes: int = Field(..., ge=0, le=2)  # 0, 1 o 2
     probability_no_diabetes: float = Field(..., ge=0, le=1)
     probability_prediabetes: float = Field(..., ge=0, le=1)
     probability_diabetes: float = Field(..., ge=0, le=1)
-    
-    processing_time_ms: Optional[float] = None 
-    
+    processing_time_ms: Optional[float] = None
