@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from typing import Optional
 
 
 class HealthForm(BaseModel):
@@ -28,13 +29,11 @@ class HealthForm(BaseModel):
 
 
 class DiabetesPrediction(BaseModel):
-    patient_data_id: str  # UUID в виде строки
-    predicted_diabetes: int = Field(..., ge=0, le=2)  # 0, 1 или 2
+    patient_data_id: str  # UUID 
+    predicted_diabetes: int = Field(..., ge=0, le=2)  # 0, 1 or 2
     probability_no_diabetes: float = Field(..., ge=0, le=1)
     probability_prediabetes: float = Field(..., ge=0, le=1)
     probability_diabetes: float = Field(..., ge=0, le=1)
-    max_probability: float = Field(..., ge=0, le=1)
-    model_version: Optional[str] = "1.0.0"
-    model_name: Optional[str] = "diabetes_classifier"
+    
     processing_time_ms: Optional[float] = None 
     
