@@ -1,0 +1,49 @@
+body {
+    background: linear-gradient(to right, #88a9e7, #dbe6f4);
+    font-family: 'Segoe UI', sans-serif;
+    color: #1c1e21;
+    margin: 0;
+    padding: 0;
+}
+
+.glass-card {
+    backdrop-filter: blur(12px);
+    background-color: rgba(255, 255, 255, 0.35);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    margin-bottom: 30px;
+    color: #1c1e21;
+}
+
+h2, h3 {
+    color: #1c1e21;
+    font-weight: 600;
+}
+
+button.btn-primary {
+    background-color: #1976d2;
+    border-color: #1976d2;
+    color: white;
+}
+button.btn-primary:hover {
+    background-color: #1565c0;
+    border-color: #1565c0;
+}
+
+input, select, .form-control {
+    background-color: rgba(255, 255, 255, 0.85) !important;
+    border-radius: 8px !important;
+    color: #000 !important;
+}
+
+label {
+    color: #1c1e21;
+    font-weight: 500;
+}
+
+.container {
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
