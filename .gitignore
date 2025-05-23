@@ -178,3 +178,4 @@ cython_debug/
 
 # This is a common file format used for saving and loading machine learning models.
 **/*.joblib
+*.joblib
