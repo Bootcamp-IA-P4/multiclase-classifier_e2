@@ -5,26 +5,26 @@
 {'penalty': 'l1', 'C': 100}
 ```
 
-**Best CV Score:** 0.4756
+**Best CV Score (Validation - Precision Prediabetes):** 0.3368
 
-**Tuning Time:** 0.96 seconds
+**Tuning Time:** 0.54 seconds
 
 ## Classification Report on Test Set
 ```
               precision    recall  f1-score   support
 
- No Diabetes       0.94      0.67      0.78     38012
- Prediabetes       0.03      0.25      0.06       926
-    Diabetes       0.35      0.61      0.45      7019
+ No Diabetes       0.99      0.03      0.06     38012
+ Prediabetes       0.02      0.99      0.04       926
+    Diabetes       0.73      0.00      0.01      7019
 
-    accuracy                           0.65     45957
-   macro avg       0.44      0.51      0.43     45957
-weighted avg       0.83      0.65      0.71     45957
+    accuracy                           0.05     45957
+   macro avg       0.58      0.34      0.04     45957
+weighted avg       0.93      0.05      0.05     45957
 ```
 
 ## Confusion Matrix on Test Set
 ```
-[[25377  5157  7478]
- [  285   234   407]
- [ 1381  1338  4300]]
+[[ 1136 36868     8]
+ [    6   919     1]
+ [    4  6991    24]]
 ```

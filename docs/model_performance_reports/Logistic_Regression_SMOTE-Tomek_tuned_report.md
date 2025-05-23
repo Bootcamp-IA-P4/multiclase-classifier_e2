@@ -5,9 +5,9 @@
 {'penalty': 'l2', 'C': 1}
 ```
 
-**Best CV Score:** 0.3442
+**Best CV Score (Validation - Precision Prediabetes):** 0.3442
 
-**Tuning Time:** 33.65 seconds
+**Tuning Time:** 27.95 seconds
 
 ## Classification Report on Test Set
 ```

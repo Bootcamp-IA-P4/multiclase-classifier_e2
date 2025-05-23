@@ -5,9 +5,9 @@
 {'subsample': 0.8, 'n_estimators': 200, 'max_depth': 3, 'learning_rate': 0.1}
 ```
 
-**Best CV Score:** 0.7229
+**Best CV Score (Validation - Precision Prediabetes):** 0.7483
 
-**Tuning Time:** 120.39 seconds
+**Tuning Time:** 182.77 seconds
 
 ## Classification Report on Test Set
 ```

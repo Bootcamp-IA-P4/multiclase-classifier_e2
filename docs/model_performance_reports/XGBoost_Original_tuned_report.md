@@ -2,12 +2,12 @@
 
 **Best Parameters (CV):**
 ```json
-{'subsample': 0.8, 'n_estimators': 200, 'max_depth': 3, 'learning_rate': 0.1}
+{'subsample': 0.7, 'n_estimators': 200, 'max_depth': 3, 'learning_rate': 0.1}
 ```
 
-**Best CV Score:** 0.7937
+**Best CV Score (Validation - Precision Prediabetes):** 0.0000
 
-**Tuning Time:** 44.88 seconds
+**Tuning Time:** 62.84 seconds
 
 ## Classification Report on Test Set
 ```
@@ -24,7 +24,7 @@ weighted avg       0.79      0.84      0.80     45957
 
 ## Confusion Matrix on Test Set
 ```
-[[37137     0   875]
- [  841     0    85]
- [ 5634     0  1385]]
+[[37126     0   886]
+ [  843     0    83]
+ [ 5631     0  1388]]
 ```
