@@ -46,30 +46,34 @@ app.layout = dbc.Container([
                 dbc.Label("Altura (cm)", className="mt-2"),
                 dcc.Input(id="Height", type="number", step=0.1, className="form-control"),
             ], className="mb-3"),
+            dropdown_question("Sexo", "Sex", {0: "Femenino", 1: "Masculino"}),
+            dropdown_question("Edad", "Age", {i: f"Grupo {i}" for i in range(1, 14)}),
+            
+        ]),
+        html.H3("Preguntas sobre sus hábitos de vida:", className="mt-4"),
+        dbc.Col([
             html.Div([
                 dbc.Label("Días de mala salud mental (últimos 30 días)"),
                 dcc.Input(id="MentHlth", type="number", min=0, max=30, className="form-control"),
                 dbc.Label("Días de mala salud física (últimos 30 días)", className="mt-2"),
                 dcc.Input(id="PhysHlth", type="number", min=0, max=30, className="form-control"),
             ], className="mb-3"),
+            binary_question("¿Actividad física en últimos 30 días?", "PhysActivity"),
+            binary_question("¿Consume frutas diariamente?", "Fruits"),
+            binary_question("¿Consume vegetales diariamente?", "Veggies"),
+            binary_question("¿Es bebedor excesivo?", "HvyAlcoholConsump"),
+        ]),
+        html.H3("Preguntas sobre su salud general:", className="mt-4"),
+        dbc.Col([
             dropdown_question("Salud general", "GenHlth", {
                 1: "Excelente", 2: "Muy buena", 3: "Buena", 4: "Regular", 5: "Mala"
             }),
-            dropdown_question("Sexo", "Sex", {0: "Femenino", 1: "Masculino"}),
-            dropdown_question("Edad", "Age", {i: f"Grupo {i}" for i in range(1, 14)}),
-        ]),
-        html.H3("Preguntas sobre sus hábitos de vida:", className="mt-4"),
-        dbc.Col([
             binary_question("¿Tiene presión arterial alta?", "HighBP"),
             binary_question("¿Tiene colesterol alto?", "HighChol"),
             binary_question("¿Revisión de colesterol en 5 años?", "CholCheck"),
             binary_question("¿Ha fumado 5 paquetes en su vida?", "Smoker"),
             binary_question("¿Ha tenido un derrame cerebral?", "Stroke"),
             binary_question("¿Enfermedad coronaria o infarto?", "HeartDiseaseorAttack"),
-            binary_question("¿Actividad física en últimos 30 días?", "PhysActivity"),
-            binary_question("¿Consume frutas diariamente?", "Fruits"),
-            binary_question("¿Consume vegetales diariamente?", "Veggies"),
-            binary_question("¿Es bebedor excesivo?", "HvyAlcoholConsump"),
             binary_question("¿Tiene cobertura médica?", "AnyHealthcare"),
             binary_question("¿No fue al médico por el costo?", "NoDocbcCost"),
             binary_question("¿Tiene dificultad al caminar?", "DiffWalk"),
@@ -138,9 +142,20 @@ def predict(n_clicks, *values):
     input_df = pd.DataFrame([val_list], columns=column_names)
     try:
         prediction = model.predict(input_df)[0]
-        return dbc.Alert(f"Predicción del modelo: {prediction}", color="success")
+
+        # Mapear predicción a mensaje
+        messages = {
+            0: "No padece diabetes",
+            1: "Tiene prediabetes",
+            2: "Tiene diabetes"
+        }
+        message = messages.get(prediction, f"Resultado desconocido: {prediction}")
+
+        return dbc.Alert(f"Predicción del modelo: {message}", color="success")
+
     except Exception as e:
         return dbc.Alert(f"Error en la predicción: {str(e)}", color="danger")
+
 
 if __name__ == "__main__":
     app.run(debug=True)
