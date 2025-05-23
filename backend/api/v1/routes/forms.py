@@ -14,8 +14,8 @@ def create_form(form: HealthForm):
     try:
         result = save_form_record(form.model_dump())  # <--- Usa el servicio
         if result.error:
-            logger.error(f"Error al guardar formulario: {response.error}")
-            raise HTTPException(status_code=500, detail=str(response.error))
+            logger.error(f"Error al guardar formulario: {result.error}")
+            raise HTTPException(status_code=500, detail=str(result.error))
         logger.info("Formulario guardado correctamente")
         return result
     except Exception as e:
