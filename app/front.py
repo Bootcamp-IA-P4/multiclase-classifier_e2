@@ -47,8 +47,21 @@ app.layout = dbc.Container([
                 dcc.Input(id="Height", type="number", step=0.1, className="form-control"),
             ], className="mb-3"),
             dropdown_question("Sexo", "Sex", {0: "Femenino", 1: "Masculino"}),
-            dropdown_question("Edad", "Age", {i: f"Grupo {i}" for i in range(1, 14)}),
-            
+            dropdown_question("Edad", "Age", {
+                1: "18-24",
+                2: "25-29",
+                3: "30-34",
+                4: "35-39",
+                5: "40-44",
+                6: "45-49",
+                7: "50-54",
+                8: "55-59",
+                9: "60-64",
+                10: "65-69",
+                11: "70-74",
+                12: "75-79",
+                13: "80 o más"
+            }),
         ]),
         html.H3("Preguntas sobre sus hábitos de vida:", className="mt-4"),
         dbc.Col([
