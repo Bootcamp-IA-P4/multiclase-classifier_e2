@@ -41,7 +41,17 @@ def section_card(title, content, id_):
 
 app.layout = dbc.Container([
     dbc.Col([
-        html.Img(src="assets/logo.png", style={"width": "300px"}),
+        dbc.Row([
+            dbc.Col(
+                html.Img(src="assets/logo.png", style={"width": "300px", "marginTop": "10px"}),
+                width="auto"
+            ),
+            dbc.Col(
+                dbc.Button("Ver historial", id="history-btn", color="info", style={"marginTop": "20px"}),
+                width="auto",
+                className="d-flex justify-content-end align-items-center"
+            )
+        ], className="mb-4 justify-content-between"),
         html.H2("Formulario de Predicción de Salud", className="text-center mt-4"),
 
         dcc.Store(id="step", data=1),
