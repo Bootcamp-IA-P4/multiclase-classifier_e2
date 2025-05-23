@@ -2,6 +2,7 @@ import os
 import joblib
 import numpy as np
 
+# Verificar las cargas del modelo y predecir la clase válida
 def test_model_load_and_predict():
     # 1. Ruta absoluta al modelo
     model_path = os.path.join("model", "model_lgbm.pkl")
