@@ -11,6 +11,7 @@ MODEL_PATH = os.path.abspath(MODEL_PATH)
 model = joblib.load(MODEL_PATH)
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+app.title = "DIABETEST"
 server = app.server
 
 def binary_question(label, id_):
