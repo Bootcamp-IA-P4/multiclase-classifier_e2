@@ -123,7 +123,7 @@ app.layout = dbc.Container([
             dbc.Col(dbc.Button("Anterior", id="prev-btn", color="secondary", className="me-2", disabled=True), width="auto"),
             dbc.Col(dbc.Button("Siguiente", id="next-btn", color="primary"), width="auto"),
             dbc.Col(dbc.Button("Predecir", id="submit", color="success", style={"display": "none"}), width="auto"),
-        ], className="mt-3"),
+        ], className="mt-3 justify-content-center"),
 
         html.Div(id="output", className="mt-4"),
     ], width=12, lg=10, xl=8)
