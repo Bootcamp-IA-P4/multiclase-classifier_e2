@@ -1,34 +1,48 @@
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from fastapi.testclient import TestClient
-from app import api  # Ajusta si has renombrado tu archivo de FastAPI (Existe una carpeta llamada app/Dentro hay un archivo llamado api.py)
+from app.api import app  # Ajusta si el archivo tiene otro nombre o ruta
 
-client = TestClient(api.app)  # Usamos la instancia "app" de FastAPI si por ejemplo existe  app = FastAPI()
-# Si mi compañero lo define con otro nombre (por ejemplo, application = FastAPI()), tendrás que hacer:
-# client = TestClient(main.application)
-# Una vez que tenga el archivo real, lo abro y busco la línea donde se crea la app:
-# app = FastAPI()
+client = TestClient(app)
 
-def test_get_forms_returns_status_200_or_500():
-    response = client.get("/forms")
-    assert response.status_code in [200, 500]  # Permitimos 500 por si falla Supabase
-
-def test_post_forms_invalid_data():
-    response = client.post("/forms", json={"age": "no es un número"})
-    assert response.status_code == 422  # Error de validación de FastAPI
-
-def test_post_predictions_invalid_class():
-    # Este test envía un campo de clase inválido (por ejemplo, 4)
-    prediction = {
-        "patient_data_id": "1234",
-        "predicted_diabetes": 4,  # Inválido
-        "probability_no_diabetes": 0.3,
-        "probability_prediabetes": 0.3,
-        "probability_diabetes": 0.4,
-        "max_probability": 0.4
+def test_predict_valid_input():
+    # Entrada simulada válida que coincide con PredictionInput
+    payload = {
+        "BMI": 24.5,
+        "Sex": 1,
+        "Age": 5,
+        "Education": 4,
+        "Income": 6,
+        "MentHlth": 1,
+        "PhysHlth": 2,
+        "PhysActivity": 1,
+        "Fruits": 1,
+        "Veggies": 1,
+        "HvyAlcoholConsump": 0,
+        "GenHlth": 2,
+        "HighBP": 1,
+        "HighChol": 1,
+        "CholCheck": 1,
+        "Smoker": 0,
+        "Stroke": 0,
+        "HeartDiseaseorAttack": 0,
+        "AnyHealthcare": 1,
+        "NoDocbcCost": 0,
+        "DiffWalk": 0
     }
-    response = client.post("/predictions", json=prediction)
-    assert response.status_code == 422  # FastAPI lanza error por fuera de rango
 
-# Mirar como se llaman las rutas
-# response = client.get("/forms")
-# response = client.post("/forms", json={...})
-# response = client.post("/predictions", json={...})
+    response = client.post("/predict", json=payload)
+
+    # Verificamos que la API responde correctamente
+    assert response.status_code == 200, f"Error inesperado: {response.status_code} - {response.text}"
+    
+    result = response.json()
+
+    # Verificamos que los campos esperados están presentes
+    assert "prediction" in result, "Falta el campo 'prediction' en la respuesta"
+    assert "probabilities" in result, "Falta el campo 'probabilities' en la respuesta"
+    assert isinstance(result["prediction"], int), "'prediction' debe ser un int"
+    assert isinstance(result["probabilities"], list), "'probabilities' debe ser una lista"
+    assert len(result["probabilities"]) == 3, "'probabilities' debe tener 3 elementos"
