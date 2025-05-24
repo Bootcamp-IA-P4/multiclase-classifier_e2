@@ -539,7 +539,10 @@ def predict(
             [
                 html.H4(result_text),
                 html.P(
-                    f"Probabilidades: No diabetes: {prediction_proba[0]:.2f}, Prediabetes: {prediction_proba[1]:.2f}, Diabetes: {prediction_proba[2]:.2f}"
+                    f"Probabilidades: "
+                    f"No diabetes: {prediction_proba[0] * 100:.1f}%, "
+                    f"Prediabetes: {prediction_proba[1] * 100:.1f}%, "
+                    f"Diabetes: {prediction_proba[2] * 100:.1f}%"
                 ),
             ],
             color=color,

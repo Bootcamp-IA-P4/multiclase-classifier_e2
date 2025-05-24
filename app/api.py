@@ -1,27 +1,36 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import List
+from typing import Optional
 import joblib
 import numpy as np
 import os
-from supabase import create_client, Client
 from datetime import datetime
 import uuid
-
-# === CONFIGURACIÓN SUPABASE ===
+import time
+import pandas as pd
 from dotenv import load_dotenv
+
+# === CONFIGURACIÓN SUPABASE (opcional) ===
 load_dotenv()
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+supabase = None
+try:
+    from supabase import create_client, Client
+    if SUPABASE_URL and SUPABASE_KEY:
+        supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+except Exception as e:
+    print("⚠️ No se pudo conectar con Supabase:", e)
+    supabase = None
 
 # === APP Y MODELO ===
 app = FastAPI(title="Backend FastAPI - Diabetes Predictor")
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "..", "model", "model_lgbm.pkl")
 model = joblib.load(MODEL_PATH)
 
-# === DATOS DE ENTRADA (mismo formato que espera el modelo) ===
+# === DATOS DE ENTRADA ===
 class PredictionInput(BaseModel):
     BMI: float
     Sex: int
@@ -48,35 +57,40 @@ class PredictionInput(BaseModel):
 @app.post("/predict")
 def predict(input_data: PredictionInput):
     try:
-        # Preparamos input
         data_dict = input_data.dict()
-        values = list(data_dict.values())
-        X = np.array(values).reshape(1, -1)
+        patient_data_id = str(uuid.uuid4())
 
         # Predicción
+        start = time.time()
+        X = pd.DataFrame([data_dict])  # Usamos DataFrame para evitar warning
         pred = model.predict(X)[0]
         proba = model.predict_proba(X)[0]
+        elapsed = round((time.time() - start) * 1000, 2)
 
-        # Guardamos en Supabase
-        record = {
-            "id": str(uuid.uuid4()),
-            "created_at": datetime.utcnow().isoformat(),
-            "input_data": data_dict,
-            "predicted_diabetes": int(pred),
-            "probability_no_diabetes": round(proba[0], 4),
-            "probability_prediabetes": round(proba[1], 4),
-            "probability_diabetes": round(proba[2], 4),
-        }
+        # Guardado en Supabase (si disponible)
+        if supabase:
+            try:
+                form_record = {"id": patient_data_id, **data_dict}
+                supabase.table("health_forms").insert(form_record).execute()
 
-        response = supabase.table("diabetes_predictions").insert(record).execute()
-        if response.error:
-            raise HTTPException(status_code=500, detail=str(response.error))
+                prediction_record = {
+                    "patient_data_id": patient_data_id,
+                    "predicted_diabetes": int(pred),
+                    "probability_no_diabetes": round(proba[0], 4),
+                    "probability_prediabetes": round(proba[1], 4),
+                    "probability_diabetes": round(proba[2], 4),
+                    "processing_time_ms": elapsed
+                }
+                supabase.table("diabetes_predictions").insert(prediction_record).execute()
 
-        # Devolvemos respuesta
+            except Exception as db_error:
+                print("⚠️ Error al guardar en Supabase:", db_error)
+
         return {
             "prediction": int(pred),
             "probabilities": [round(p, 4) for p in proba]
         }
 
     except Exception as e:
+        print("❌ Error general:", e)
         raise HTTPException(status_code=500, detail=f"Error en la predicción: {str(e)}")

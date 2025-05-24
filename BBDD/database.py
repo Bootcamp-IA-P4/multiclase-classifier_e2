@@ -13,7 +13,7 @@ app = FastAPI()
 @app.post("/forms")
 def create_form(form: HealthForm):
     try:
-        response = supabase.table("patient_data").insert(form.dict()).execute()
+        response = supabase.table("health_forms").insert(form.dict()).execute()
         return response.data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -41,7 +41,7 @@ def get_recent_predictions(limit: int = 10):
             supabase
             .table("diabetes_predictions")
             .select("*")
-            .order("created_at", desc=True)
+            #.order("created_at", desc=True)
             .limit(limit)
             .execute()
         )
