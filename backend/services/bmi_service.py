@@ -8,5 +8,5 @@ def calculate_bmi(weight: float, height: float) -> float:
         logger.error("Altura menor o igual a cero")
         raise ValueError("La altura debe ser mayor que cero.")
     bmi = round(weight / ((height / 100) ** 2), 2)
-    logger.info(f"BMI calculado: {bmi}")
+    #logger.info(f"BMI calculado: {bmi}")
     return bmi

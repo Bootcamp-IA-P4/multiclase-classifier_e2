@@ -2,27 +2,27 @@ from pydantic import BaseModel, Field
 from typing import Optional
 
 class HealthForm(BaseModel):
-    age: int
-    sex: int
-    bmi: float
-    high_bp: bool
-    high_chol: bool
-    phys_activity: bool
-    fruits: bool
-    veggies: bool
-    smoker: bool
-    ment_hlth: int
-    phys_hlth: int
-    gen_hlth: int
-    income: int
-    education: int
-    diff_walk: bool
-    no_doc_bc_cost: bool
-    any_healthcare: bool
-    hvy_alcohol_consump: bool
-    chol_check: bool
-    stroke: bool
-    heart_disease_or_attack: bool
+    Age: int
+    Sex: int
+    BMI: int
+    HighBP: int
+    HighChol: int
+    PhysActivity: int
+    Fruits: int
+    Veggies: int
+    Smoker: int
+    MentHlth: int
+    PhysHlth: int
+    GenHlth: int
+    Income: int
+    Education: int
+    DiffWalk: int
+    NoDocbcCost: int
+    AnyHealthcare: int
+    HvyAlcoholConsump: int
+    CholCheck: int
+    Stroke: int
+    HeartDiseaseorAttack: int
 
 class DiabetesPrediction(BaseModel):
     patient_data_id: str  # UUID o similar

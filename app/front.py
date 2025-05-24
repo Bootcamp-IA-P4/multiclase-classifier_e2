@@ -235,28 +235,29 @@ def predict(n_clicks, Weight, Height, BMI, Sex, Age, Education, Income,
         raise dash.exceptions.PreventUpdate
 
     input_data = {
-        "age": Age,
-        "sex": Sex,
-        "bmi": BMI,
-        "high_bp": HighBP,
-        "high_chol": HighChol,
-        "phys_activity": PhysActivity,
-        "fruits": Fruits,
-        "veggies": Veggies,
-        "smoker": Smoker,
-        "ment_hlth": MentHlth,
-        "phys_hlth": PhysHlth,
-        "gen_hlth": GenHlth,
-        "income": Income,
-        "education": Education,
-        "diff_walk": DiffWalk,
-        "no_doc_bc_cost": NoDocbcCost,
-        "any_healthcare": AnyHealthcare,
-        "hvy_alcohol_consump": HvyAlcoholConsump,
-        "chol_check": CholCheck,
-        "stroke": Stroke,
-        "heart_disease_or_attack": HeartDiseaseorAttack
+        "Age": Age,
+        "Sex": Sex,
+        "BMI": BMI,
+        "HighBP": HighBP,
+        "HighChol": HighChol,
+        "PhysActivity": PhysActivity,
+        "Fruits": Fruits,
+        "Veggies": Veggies,
+        "Smoker": Smoker,
+        "MentHlth": MentHlth,
+        "PhysHlth": PhysHlth,
+        "GenHlth": GenHlth,
+        "Income": Income,
+        "Education": Education,
+        "DiffWalk": DiffWalk,
+        "NoDocbcCost": NoDocbcCost,
+        "AnyHealthcare": AnyHealthcare,
+        "HvyAlcoholConsump": HvyAlcoholConsump,
+        "CholCheck": CholCheck,
+        "Stroke": Stroke,
+        "HeartDiseaseorAttack": HeartDiseaseorAttack
     }
+
 
     if any(v is None for v in input_data.values()):
         return dbc.Alert("Por favor complete todos los campos antes de predecir.", color="danger")
