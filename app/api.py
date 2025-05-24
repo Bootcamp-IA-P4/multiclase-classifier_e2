@@ -71,7 +71,7 @@ def predict(input_data: PredictionInput):
         if supabase:
             try:
                 form_record = {"id": patient_data_id, **data_dict}
-                supabase.table("health_forms").insert(form_record).execute()
+                supabase.table("patient_data").insert(form_record).execute()
 
                 prediction_record = {
                     "patient_data_id": patient_data_id,
