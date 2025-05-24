@@ -61,7 +61,7 @@ app.layout = dbc.Container([
                     dbc.Label("Altura (cm)"),
                     dcc.Input(id="Height", type="number", step=0.1, className="form-control mb-3"),
                     dbc.Label("Índice de Masa Corporal (BMI)"),
-                    dcc.Input(id="BMI", type="number", className="form-control mb-3", disabled=True),
+                    dcc.Input(id="BMI", type="number", className="form-control mb-3", readOnly=True),
                     dropdown_question("Sexo", "Sex", {0: "Femenino", 1: "Masculino"}),
                 ], xs=12, md=6),
 
