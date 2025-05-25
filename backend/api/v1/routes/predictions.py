@@ -51,10 +51,24 @@ def get_recent_predictions(limit: int = 10):
             .limit(limit)
             .execute()
         )
-        if response.error:
-            logger.error(f"Error al obtener predicciones: {response.error}")
-            raise HTTPException(status_code=500, detail=str(response.error))
-        return response.data
+        data = getattr(response, "data", None)
+        error = getattr(response, "error", None)
+        status_code = getattr(response, "status_code", None)
+
+        if error:
+            logger.error(f"Error al obtener predicciones: {error}")
+            raise HTTPException(status_code=500, detail=str(error))
+
+        if status_code and status_code != 200:
+            logger.error(f"Error al obtener predicciones: Status code {status_code}")
+            raise HTTPException(status_code=500, detail=f"Status code {status_code}")
+
+        if data is None:
+            logger.error("No se recibieron datos de Supabase")
+            raise HTTPException(status_code=500, detail="No se recibieron datos de Supabase")
+
+        return data
+
     except Exception as e:
         logger.exception("Excepción inesperada al obtener predicciones")
         raise HTTPException(status_code=500, detail=str(e))
