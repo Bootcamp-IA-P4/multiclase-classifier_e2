@@ -557,11 +557,10 @@ def predict(
 @app.callback(
     Output("history-output", "children"),
     Input("history-btn", "n_clicks"),
-    prevent_initial_call=True,
+    prevent_initial_call=True
 )
 def show_history(n_clicks):
     try:
-        # Petición al backend para obtener historial
         response = requests.get("http://localhost:8000/history")
         response.raise_for_status()
         data = response.json()
@@ -569,38 +568,38 @@ def show_history(n_clicks):
         if not data:
             return dbc.Alert("No hay historial disponible.", color="info")
 
-        df = pd.DataFrame(data)
+        def format_prediction(row):
+            label_map = {
+                0: "No diabetes",
+                1: "Prediabetes",
+                2: "Diabetes"
+            }
 
-        # Tabla estilizada
-        table = dbc.Table.from_dataframe(
-            df[
-                [
-                    "predicted_diabetes",
-                    "probability_no_diabetes",
-                    "probability_prediabetes",
-                    "probability_diabetes",
-                    "processing_time_ms",
-                ]
-            ],
-            striped=True,
-            bordered=True,
-            hover=True,
-            responsive=True,
-        )
+            return html.Div(
+                dbc.Card(
+                    [
+                        dbc.CardHeader(
+                            html.H5(f"Predicción: {label_map.get(row['predicted_diabetes'], 'Desconocida')}"),
+                            className="text-center"
+                        ),
+                        dbc.CardBody(
+                            [
+                                html.P(f"Probabilidad No diabetes: {round(row['probability_no_diabetes']*100, 1)}%"),
+                                html.P(f"Probabilidad Prediabetes: {round(row['probability_prediabetes']*100, 1)}%"),
+                                html.P(f"Probabilidad Diabetes: {round(row['probability_diabetes']*100, 1)}%"),
+                                html.Small(f"Tiempo de procesamiento: {row['processing_time_ms']} ms", className="text-muted")
+                            ]
+                        )
+                    ],
+                    className="glass-card mb-3"
+                )
+            )
 
-        # Estilo tipo tarjeta glassmórfica
-        return dbc.Card(
-            [
-                dbc.CardHeader(
-                    html.H5("Últimas 5 predicciones", className="text-center")
-                ),
-                dbc.CardBody(table),
-            ],
-            className="glass-card mt-4",
-        )
+        return html.Div([format_prediction(row) for row in data])
 
     except Exception as e:
         return dbc.Alert(f"Error al cargar historial: {str(e)}", color="danger")
+
 
 
 if __name__ == "__main__":
