@@ -94,3 +94,20 @@ def predict(input_data: PredictionInput):
     except Exception as e:
         print("❌ Error general:", e)
         raise HTTPException(status_code=500, detail=f"Error en la predicción: {str(e)}")
+
+
+@app.get("/history")
+def get_history():
+    if not supabase:
+        raise HTTPException(status_code=500, detail="No hay conexión con Supabase.")
+    try:
+        response = (
+            supabase.table("diabetes_predictions")
+            .select("*")
+            .order("created_at", desc=True)
+            .limit(5)
+            .execute()
+        )
+        return response.data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al recuperar historial: {e}")

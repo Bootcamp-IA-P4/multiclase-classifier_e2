@@ -1,8 +1,9 @@
 import dash
-from dash import dcc, html, Input, Output, State
+from dash import ctx, dcc, html, Input, Output, State
 import dash_bootstrap_components as dbc
 import pandas as pd
 import requests
+
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.title = "DIABETEST"
@@ -319,6 +320,7 @@ app.layout = dbc.Container(
                     className="mt-3 justify-content-center",
                 ),
                 html.Div(id="output", className="mt-4"),
+                html.Div(id="history-output", className="mt-5"),
             ],
             width=12,
             lg=10,
@@ -550,6 +552,54 @@ def predict(
 
     except Exception as e:
         return dbc.Alert(f"Error en la predicción: {str(e)}", color="danger")
+
+
+@app.callback(
+    Output("history-output", "children"),
+    Input("history-btn", "n_clicks"),
+    prevent_initial_call=True
+)
+def show_history(n_clicks):
+    try:
+        response = requests.get("http://localhost:8000/history")
+        response.raise_for_status()
+        data = response.json()
+
+        if not data:
+            return dbc.Alert("No hay historial disponible.", color="info")
+
+        def format_prediction(row):
+            label_map = {
+                0: "No diabetes",
+                1: "Prediabetes",
+                2: "Diabetes"
+            }
+
+            return html.Div(
+                dbc.Card(
+                    [
+                        dbc.CardHeader(
+                            html.H5(f"Predicción: {label_map.get(row['predicted_diabetes'], 'Desconocida')}"),
+                            className="text-center"
+                        ),
+                        dbc.CardBody(
+                            [
+                                html.P(f"Probabilidad No diabetes: {round(row['probability_no_diabetes']*100, 1)}%"),
+                                html.P(f"Probabilidad Prediabetes: {round(row['probability_prediabetes']*100, 1)}%"),
+                                html.P(f"Probabilidad Diabetes: {round(row['probability_diabetes']*100, 1)}%"),
+                                html.Small(f"Tiempo de procesamiento: {row['processing_time_ms']} ms", className="text-muted")
+                            ]
+                        )
+                    ],
+                    className="glass-card mb-3"
+                )
+            )
+
+        return html.Div([format_prediction(row) for row in data])
+
+    except Exception as e:
+        return dbc.Alert(f"Error al cargar historial: {str(e)}", color="danger")
+
 
 
 if __name__ == "__main__":
