@@ -16,7 +16,7 @@ Para ello deberán rellenar de un formulario que consta de 23 preguntas y devuel
 - "Prediabetes detectada. Se recomienda vigilancia médica."
 - "¡Diabetes diagnosticada! Consulte a un especialista."
 
-El proyecto consta de un backend realizado con FastApi y conectado a una base de datos en línea en Supabase, y un frontend con Dash.
+El proyecto consta de un backend realizado con FastApi y conectado a una base de datos en línea en Supabase que guarda cada solicitud, y un frontend con Dash.
 
 ![Demo de persona sana](./docs/images/demo2.gif)
 ![Demo de persona con diabetes](./docs/images/demo1.gif)
@@ -62,10 +62,10 @@ Ahora puedes entrar a las rutas correspondientes:
 
 Tenemos 6 tests divididos en 4 archivos que comprueban que todos los pasos del programa funcionan correctamente.
 
-- test_api.py : Verifica que la API responde correctamente y que los campos esperados están presentes. 
-- test_db_connection.py : Verifica que las variables de entorno para Supabase están definidas y que se puede realizar una consulta exitosa a la tabla diabetes_predictions.
-- test_front.py : Verifica que la función predict del frontend responde correctamente a entradas válidas y simuladas, mostrando una alerta con el resultado de la predicción (por ejemplo, “Diabetes”), tanto con datos reales como con una respuesta mockeada del backend.
-- test_model.py : Verifica si el modelo se carga correctamente y predice una clase válida
+- **test_api.py** : Verifica que la API responde correctamente y que los campos esperados están presentes. 
+- **test_db_connection.py** : Verifica que las variables de entorno para Supabase están definidas y que se puede realizar una consulta exitosa a la tabla diabetes_predictions.
+- **test_front.py** : Verifica que la función predict del frontend responde correctamente a entradas válidas y simuladas, mostrando una alerta con el resultado de la predicción (por ejemplo, “Diabetes”), tanto con datos reales como con una respuesta mockeada del backend.
+- **test_model.py** : Verifica si el modelo se carga correctamente y predice una clase válida
 
 ### Para probar los tests sigue estos pasos:
 
@@ -79,5 +79,3 @@ Comando para probar los tests:
 pytest
 ````
 ![Tests passed](./docs/images/tests-passed.png)
-
-### Loggers para la trazabilidad del programa
