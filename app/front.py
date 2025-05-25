@@ -258,12 +258,13 @@ def predict(n_clicks, Weight, Height, BMI, Sex, Age, Education, Income,
         "HeartDiseaseorAttack": HeartDiseaseorAttack
     }
 
-
     if any(v is None for v in input_data.values()):
         return dbc.Alert("Por favor complete todos los campos antes de predecir.", color="danger")
 
     try:
         # 1. Guardar formulario
+        # Debug: Imprimir datos de entrada
+        print("Datos de entrada para el formulario:", input_data)   
         resp_form = requests.post(f"{BACKEND_URL}/forms/", json=input_data)
         if resp_form.status_code != 200:
             return dbc.Alert("Error al guardar el formulario.", color="danger")
