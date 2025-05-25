@@ -277,8 +277,8 @@ def predict(n_clicks, Weight, Height, BMI, Sex, Age, Education, Income,
         resp_pred = requests.post(f"{BACKEND_URL}/predictions/", json=pred_payload)
         if resp_pred.status_code != 200:
             return dbc.Alert("Error al obtener la predicción.", color="danger")
-        pred = resp_pred.json()[0]  # Ajusta según respuesta de Supabase
-
+        #pred = resp_pred.json()[0]  # Ajusta según respuesta de Supabase
+        pred = resp_pred.json()
         # Mostrar resultado
         pred_class = pred.get("predicted_diabetes")
         proba_no = pred.get("probability_no_diabetes")
