@@ -1,8 +1,9 @@
 import dash
-from dash import dcc, html, Input, Output, State
+from dash import ctx, dcc, html, Input, Output, State
 import dash_bootstrap_components as dbc
 import pandas as pd
 import requests
+
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.title = "DIABETEST"
@@ -319,6 +320,7 @@ app.layout = dbc.Container(
                     className="mt-3 justify-content-center",
                 ),
                 html.Div(id="output", className="mt-4"),
+                html.Div(id="history-output", className="mt-5"),
             ],
             width=12,
             lg=10,
@@ -550,6 +552,55 @@ def predict(
 
     except Exception as e:
         return dbc.Alert(f"Error en la predicción: {str(e)}", color="danger")
+
+
+@app.callback(
+    Output("history-output", "children"),
+    Input("history-btn", "n_clicks"),
+    prevent_initial_call=True,
+)
+def show_history(n_clicks):
+    try:
+        # Petición al backend para obtener historial
+        response = requests.get("http://localhost:8000/history")
+        response.raise_for_status()
+        data = response.json()
+
+        if not data:
+            return dbc.Alert("No hay historial disponible.", color="info")
+
+        df = pd.DataFrame(data)
+
+        # Tabla estilizada
+        table = dbc.Table.from_dataframe(
+            df[
+                [
+                    "predicted_diabetes",
+                    "probability_no_diabetes",
+                    "probability_prediabetes",
+                    "probability_diabetes",
+                    "processing_time_ms",
+                ]
+            ],
+            striped=True,
+            bordered=True,
+            hover=True,
+            responsive=True,
+        )
+
+        # Estilo tipo tarjeta glassmórfica
+        return dbc.Card(
+            [
+                dbc.CardHeader(
+                    html.H5("Últimas 5 predicciones", className="text-center")
+                ),
+                dbc.CardBody(table),
+            ],
+            className="glass-card mt-4",
+        )
+
+    except Exception as e:
+        return dbc.Alert(f"Error al cargar historial: {str(e)}", color="danger")
 
 
 if __name__ == "__main__":
