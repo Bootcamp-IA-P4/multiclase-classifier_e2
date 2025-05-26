@@ -88,12 +88,23 @@ pytest
 ````
 ![Tests passed](./docs/images/tests-passed.png)
 
+### Dockerización
+
+<img src="./docs/images/docker.png" alt="dockerizacion" width="700"/>
+
+### Renderización del backend
+
+https://multiclase-classifier-e2.onrender.com
+
+### EDA
+
+Puedes ver nuestro análisis de datos en la **rama feature/eda** > docs/notebooks/EDA.ipynb
+
 
 ##  Futuras implementaciones
 
 - Dar funcionalidad al botón "Ver historial" para mostrar las solicitudes anteriores.
-- Dockerizar
-- Renderizar
+- Renderizar el frontend
 - Mejorar las métricas del modelo
 - Reentrenar el modelo con los datos recopilados mediante el frontend
 - Acceso mediante usuarios y login
