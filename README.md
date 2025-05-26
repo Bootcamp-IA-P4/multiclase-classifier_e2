@@ -21,6 +21,14 @@ El proyecto consta de un backend realizado con FastApi y conectado a una base de
 ![Demo de persona sana](./docs/images/demo2.gif)
 ![Demo de persona con diabetes](./docs/images/demo1.gif)
 
+Tabmién mediante el botón "Ver historial" se puede ver las 5 últimas solicitudes.
+
+![Historial](./docs/images/historial.png)
+
+El flujo del trabajo es el siguiente:
+
+<img src="./docs/images/api-flow.png" alt="Api flow" width="300"/>
+
 ### Para poner en marcha el proyecto usa los siguientes comandos:
 
 Clona el repositorio en tu PC:
